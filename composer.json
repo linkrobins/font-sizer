@@ -1,0 +1,24 @@
+{
+    "name": "linkrobins/font-sizer",
+    "description": "Adds a font size slider to the admin panel that scales the entire forum's base font size. Changes apply and save instantly.",
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^2.0"
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Link Robins Font Sizer",
+            "icon": {
+                "name": "fas fa-text-height",
+                "backgroundColor": "#1a2535",
+                "color": "#07adcc"
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "LinkRobins\\FontSizer\\": "src/"
+        }
+    }
+}
