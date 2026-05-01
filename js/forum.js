@@ -13,17 +13,19 @@
             var scale = parseInt((payload.resources[0].attributes['linkrobinsFontScale']) || '100', 10);
             if (!scale || scale === 100) return;
 
-            var ratio = scale / 100;
-            document.documentElement.style.fontSize = scale + '%';
+            var base = 16;
+            var scaled = base * (scale / 100);
+            document.documentElement.style.fontSize = scaled + 'px';
 
             var style = document.createElement('style');
             style.textContent = [
-                'body, body * {',
-                '    font-size: ' + ratio + 'em !important;',
-                '}',
-                'body .icon, body .Button-icon, body .Avatar,',
-                'body i[class*="fa-"], body .emoji {',
-                '    font-size: inherit !important;',
+                'body { font-size: ' + scaled + 'px !important; }',
+                'body p, body li, body td, body th, body span, body a,',
+                'body h1, body h2, body h3, body h4, body h5, body h6,',
+                'body input, body textarea, body button, body label,',
+                'body .Post-body, body .DiscussionListItem-title,',
+                'body .PostUser-name, body .DiscussionListItem-info {',
+                '    font-size: ' + scaled + 'px !important;',
                 '}'
             ].join('\n');
             document.head.appendChild(style);
