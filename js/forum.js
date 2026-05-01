@@ -1,9 +1,6 @@
 'use strict';
 
 (function() {
-    // forum.js executes synchronously as the browser parses it, which is
-    // BEFORE the flarum-json-payload <script> tag further down the page exists.
-    // We must wait for DOMContentLoaded so the payload element is in the DOM.
 
     document.addEventListener('DOMContentLoaded', function() {
         try {
