@@ -14,7 +14,6 @@ A Flarum 2.0 extension that lets you scale the base font size of your entire for
 
 The slider runs from **100%** (default, all the way left) to **150%** (all the way right) in 1% increments. The selected value is saved to Flarum's settings table under the key `linkrobins-font-sizer.scale` and served to the forum frontend in the page payload.
 
-On the forum, the extension reads this value during boot and sets `document.documentElement.style.fontSize` before any content renders, avoiding any flash of unsized text.
 
 ## Installation
 
