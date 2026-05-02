@@ -131,6 +131,17 @@
         injectUIStyles();
     }
 
+    // Hide "Font Size" label on desktop; show it on mobile to match other header items
+    (function() {
+        var s = document.createElement('style');
+        s.textContent = '@media (min-width: 768px) {' +
+            ' .FontSizerDropdown .Button-label { display: none; }' +
+            ' .FontSizerDropdown .Button { width: 36px; padding: 8px 0; }' +
+            ' .FontSizerDropdown .Button-icon { font-size: 16px; margin: 0; }' +
+            ' }';
+        document.head.appendChild(s);
+    })();
+
 
     // ── Slider label helper ────────────────────────────────────────────────────
     // 100% = "Flarum Default", adminDefault = "Admin Preference (X%)", else "X%"
@@ -152,16 +163,15 @@
             'padding:16px;'
         ].join('');
 
-        // Box theme-agnostic
+        // Box styled using Flarum CSS variables so it's theme-agnostic
         var box = document.createElement('div');
         box.style.cssText = [
-            'background:var(--control-bg);',
+            'background:var(--body-bg);',
             'color:var(--body-color);',
-            'border:1px solid var(--control-color);',
-            'border-radius:var(--border-radius, 6px);',
+            'border-radius:var(--border-radius, 4px);',
             'padding:24px 24px 20px;',
             'width:360px;max-width:100%;',
-            'box-shadow:0 4px 24px rgba(0,0,0,0.25);',
+            'box-shadow:0 7px 15px var(--shadow-color);',
             'font-family:inherit;font-size:14px;'
         ].join('');
 
@@ -191,7 +201,7 @@
         // ── Divider ──
         function divider() {
             var hr = document.createElement('hr');
-            hr.style.cssText = 'border:none;border-top:1px solid var(--control-color);margin:0 -24px 16px;';
+            hr.style.cssText = 'border:none;margin:0 -24px 16px;';
             return hr;
         }
 
@@ -293,7 +303,7 @@
 
         // ── Reset ──
         var resetRow = document.createElement('div');
-        resetRow.style.cssText = 'border-top:1px solid var(--control-color);padding-top:12px;text-align:center;';
+        resetRow.style.cssText = 'padding-top:12px;text-align:center;';
         var resetBtn = document.createElement('button');
         resetBtn.textContent = 'Reset all to Flarum defaults';
         resetBtn.style.cssText = [
@@ -344,7 +354,7 @@
         document.removeEventListener('keydown', onKeydown);
     }
 
-    // ── Header button ───────────────────────────────────────
+    // ── Header button via Flarum extend ───────────────────────────────────────
     app.initializers.add('linkrobins-font-sizer', function() {
         loadState();
         applyAll();
@@ -354,10 +364,10 @@
 
         extend(HeaderSecondary.prototype, 'items', function(items) {
             items.add('font-sizer',
-                m('div', { className: 'ButtonGroup Dropdown dropdown HeaderDropdown FontSizerDropdown' },
+                m('div', { className: 'HeaderDropdown FontSizerDropdown' },
                     m('button', {
                         type: 'button',
-                        className: 'Dropdown-toggle Button Button--flat',
+                        className: 'Button Button--flat',
                         title: 'Font Size',
                         'aria-label': 'Font Size',
                         onclick: openModal
@@ -368,7 +378,7 @@
                         )
                     )
                 ),
-                -10
+                5
             );
         });
     });
