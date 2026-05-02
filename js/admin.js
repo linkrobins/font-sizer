@@ -30,7 +30,21 @@
             self._scale = val;
 
             
-            document.documentElement.style.fontSize = val === MIN ? '' : val + '%';
+            var existing = document.getElementById('lr-font-sizer-preview');
+            if (val === MIN) {
+                if (existing) existing.remove();
+            } else {
+                if (!existing) { existing = document.createElement('style'); existing.id = 'lr-font-sizer-preview'; document.head.appendChild(existing); }
+                var pct = val + '%';
+                existing.textContent = [
+                    '.Post-body, .Post-body p, .Post-body li,',
+                    '.Post-body blockquote, .Post-body td, .Post-body th,',
+                    '.Post-body pre, .Post-body code { font-size: ' + pct + ' !important; }',
+                    '.DiscussionHero .DiscussionHero-title,',
+                    '.DiscussionPage .Hero-title,',
+                    'h2.DiscussionListItem-title, h3.DiscussionListItem-title { font-size: ' + pct + ' !important; }'
+                ].join('\n');
+            }
 
             
             var body = {};
@@ -50,7 +64,7 @@
                 m('div', { className: 'Form-group' }, [
                     m('label', 'Font Size'),
                     m('p', { className: 'helpText' },
-                        'Adjusts the base font size across the entire forum. ' +
+                        'Adjusts the font size for post titles and post body text only. ' +
                         'All the way left is the default. Changes save and apply instantly.'
                     ),
                     m('div', { style: 'display:flex;align-items:center;gap:1rem;margin-top:.5rem;' }, [
@@ -73,7 +87,8 @@
                         type: 'button',
                         onclick: function() {
                             self._scale = MIN;
-                            document.documentElement.style.fontSize = '';
+                            var p = document.getElementById('lr-font-sizer-preview');
+                            if (p) p.remove();
                             var body = {};
                             body[SETTING_KEY] = String(MIN);
                             saveSettings(body).catch(function() {});
