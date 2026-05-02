@@ -4,7 +4,7 @@ A Flarum 2.0 extension that gives users accessibility-focused font size controls
 
 ## Features
 
-- **Header button** — a font size icon in the forum header opens a modal for all users, including guests
+- **Header button** — a `fa-text-height` icon in the forum header opens a modal for all users, including guests
 - **Reading text slider** — scales post body text and discussion titles from 100% to 150% in 5% increments
 - **Interface size toggle** — Default or Large (115%) mode for navigation, buttons, and other UI elements
 - **Cookie persistence** — preferences are saved for 1 year so returning visitors keep their settings

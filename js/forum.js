@@ -2,6 +2,7 @@
 
 (function() {
 
+    // ── Constants ──────────────────────────────────────────────────────────────
     var COOKIE_TEXT = 'lr_text_scale';
     var COOKIE_UI   = 'lr_ui_size';
     var TEXT_MIN    = 100;
@@ -15,6 +16,7 @@
         list:        14
     };
 
+    // ── Cookie helpers ─────────────────────────────────────────────────────────
     function getCookie(name) {
         var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
         return match ? decodeURIComponent(match[1]) : null;
@@ -27,6 +29,7 @@
             '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
     }
 
+    // ── Admin default ──────────────────────────────────────────────────────────
     function getAdminDefault() {
         try {
             var el = document.getElementById('flarum-json-payload');
@@ -36,6 +39,7 @@
         } catch (e) { return TEXT_MIN; }
     }
 
+    // ── State ──────────────────────────────────────────────────────────────────
     var textScale, uiLarge;
 
     function getAdminUIDefault() {
@@ -50,10 +54,12 @@
     function loadState() {
         var cookieText = getCookie(COOKIE_TEXT);
         var cookieUI   = getCookie(COOKIE_UI);
+        // If no cookie, use admin defaults
         textScale = cookieText !== null ? parseInt(cookieText, 10) : getAdminDefault();
         uiLarge   = cookieUI   !== null ? (cookieUI === 'large')   : getAdminUIDefault();
     }
 
+    // ── Style injection ────────────────────────────────────────────────────────
     function px(base, scale) {
         return Math.round(base * (scale / 100)) + 'px';
     }
@@ -126,15 +132,19 @@
     }
 
 
+    // ── Slider label helper ────────────────────────────────────────────────────
+    // 100% = "Flarum Default", adminDefault = "Admin Preference (X%)", else "X%"
     function textLabel(val) {
         return val + '%';
     }
 
+    // ── Modal ──────────────────────────────────────────────────────────────────
     function openModal() {
         if (document.getElementById('lr-sizer-modal-overlay')) return;
 
         var overlay = document.createElement('div');
         overlay.id = 'lr-sizer-modal-overlay';
+        // Use Flarum's modal backdrop approach
         overlay.style.cssText = [
             'position:fixed;inset:0;z-index:99999;',
             'background:rgba(0,0,0,0.5);',
@@ -142,6 +152,7 @@
             'padding:16px;'
         ].join('');
 
+        // Box theme-agnostic
         var box = document.createElement('div');
         box.style.cssText = [
             'background:var(--control-bg);',
@@ -154,6 +165,7 @@
             'font-family:inherit;font-size:14px;'
         ].join('');
 
+        // ── Title row ──
         var titleRow = document.createElement('div');
         titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;';
 
@@ -176,12 +188,14 @@
         titleRow.appendChild(titleEl);
         titleRow.appendChild(closeBtn);
 
+        // ── Divider ──
         function divider() {
             var hr = document.createElement('hr');
             hr.style.cssText = 'border:none;border-top:1px solid var(--control-color);margin:0 -24px 16px;';
             return hr;
         }
 
+        // ── Section label ──
         function sectionLabel(text) {
             var el = document.createElement('div');
             el.style.cssText = [
@@ -193,6 +207,7 @@
             return el;
         }
 
+        // ── Section 1: Reading Text ──
         var sec1 = document.createElement('div');
         sec1.style.marginBottom = '18px';
         sec1.appendChild(sectionLabel('Reading Text'));
@@ -223,11 +238,13 @@
         sliderRow.appendChild(sliderLbl);
         sec1.appendChild(sliderRow);
 
+        // hint
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:.75rem;color:var(--muted-color);margin-top:6px;';
         hint.textContent = 'Affects post body and discussion titles.';
         sec1.appendChild(hint);
 
+        // ── Section 2: Interface Size ──
         var sec2 = document.createElement('div');
         sec2.style.marginBottom = '20px';
         sec2.appendChild(sectionLabel('Interface Size'));
@@ -274,6 +291,7 @@
         sec2.appendChild(btnGroup);
         sec2.appendChild(uiHint);
 
+        // ── Reset ──
         var resetRow = document.createElement('div');
         resetRow.style.cssText = 'border-top:1px solid var(--control-color);padding-top:12px;text-align:center;';
         var resetBtn = document.createElement('button');
@@ -311,6 +329,7 @@
         overlay.appendChild(box);
         overlay.onclick = function(e) { if (e.target === overlay) closeModal(); };
 
+        // close on Escape
         document.addEventListener('keydown', onKeydown);
         document.body.appendChild(overlay);
     }
@@ -325,6 +344,7 @@
         document.removeEventListener('keydown', onKeydown);
     }
 
+    // ── Header button ───────────────────────────────────────
     app.initializers.add('linkrobins-font-sizer', function() {
         loadState();
         applyAll();
@@ -348,7 +368,7 @@
                         )
                     )
                 ),
-                10
+                -10
             );
         });
     });
