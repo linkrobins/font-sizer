@@ -10,6 +10,8 @@ return [
         ->js(__DIR__ . '/js/admin.js'),
 
     (new Extend\Settings())
-        ->serializeToForum('linkrobinsFontScale', 'linkrobins-font-sizer.scale')
-        ->default('linkrobins-font-sizer.scale', '100'),
+        ->serializeToForum('linkrobinsFontScale',    'linkrobins-font-sizer.scale')
+        ->serializeToForum('linkrobinsFontSizerUi',  'linkrobins-font-sizer.ui')
+        ->default('linkrobins-font-sizer.scale', '100')
+        ->default('linkrobins-font-sizer.ui',    'default'),
 ];

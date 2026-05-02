@@ -1,6 +1,6 @@
 {
     "name": "linkrobins/font-sizer",
-    "description": "Adds a font size slider to the admin panel that scales the entire forum's base font size. Changes apply and save instantly.",
+    "description": "Accessibility-focused font size controls for Flarum 2.0. Users can adjust reading text size and interface size via a header button, with preferences saved in cookies. Admins set sitewide defaults from the extension settings.",
     "type": "flarum-extension",
     "license": "MIT",
     "require": {

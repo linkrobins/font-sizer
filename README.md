@@ -1,19 +1,23 @@
 # Link Robins Font Sizer
 
-A Flarum 2.0 extension that lets you scale the base font size of your entire forum from the admin panel — no CSS editing required.
+A Flarum 2.0 extension that gives users accessibility-focused font size controls directly in the forum header — no CSS editing required. Admins set sitewide defaults; users override them with their own preferences, saved in cookies.
 
 ## Features
 
-- **Slider control** in the extension's admin page
-- **Instant save** — no submit button, changes are applied and persisted as you drag
-- **Live preview** — the admin panel itself resizes as you adjust the slider so you can see the effect immediately
-- **Reset button** — appears when the value is above default, letting you snap back to 100% in one click
-- **Theme agnostic** — uses `font-size` on the `<html>` element so all `rem`-based sizing in Flarum and its extensions scales proportionally
+- **Header button** — a font size icon in the forum header opens a modal for all users, including guests
+- **Reading text slider** — scales post body text and discussion titles from 100% to 150% in 5% increments
+- **Interface size toggle** — Default or Large (115%) mode for navigation, buttons, and other UI elements
+- **Cookie persistence** — preferences are saved for 1 year so returning visitors keep their settings
+- **Admin defaults** — set a sitewide default for both reading text size and interface size from the extension settings page
+- **Live preview** — the admin panel previews changes as you drag the slider
+- **Debounced save** — settings save 500ms after you stop dragging to prevent API conflicts
+- **Theme agnostic** — uses Flarum CSS variables throughout; works on all light and dark themes
 
 ## How it works
 
-The slider runs from **100%** (default, all the way left) to **150%** (all the way right) in 1% increments. The selected value is saved to Flarum's settings table under the key `linkrobins-font-sizer.scale` and served to the forum frontend in the page payload.
+The reading text slider runs from **100%** (Flarum default) to **150%** in 5% increments. The interface size toggle offers **Default** or **Large** (115%). Both values are stored as cookies (`lr_text_scale` and `lr_ui_size`) on the user's browser. If no cookie exists, the user sees whatever the admin has configured as the sitewide default.
 
+Admin defaults are saved to Flarum's settings table under `linkrobins-font-sizer.scale` and `linkrobins-font-sizer.ui`, and served to the forum frontend in the page payload.
 
 ## Installation
 
