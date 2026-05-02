@@ -2,34 +2,67 @@
 
 (function() {
 
-    document.addEventListener('DOMContentLoaded', function() {
+    var scale;
+
+    var DEFAULTS = {
+        heroMobile:  16,
+        heroDesktop: 22,
+        body:        14,
+        list:        14
+    };
+
+    function getScale() {
         try {
             var el = document.getElementById('flarum-json-payload');
-            if (!el) return;
+            if (!el) return 100;
             var payload = JSON.parse(el.textContent);
-            var scale = parseInt((payload.resources[0].attributes['linkrobinsFontScale']) || '100', 10);
-            if (!scale || scale === 100) return;
+            return parseInt((payload.resources[0].attributes['linkrobinsFontScale']) || '100', 10);
+        } catch (e) { return 100; }
+    }
 
-            var pct = scale + '%';
+    function px(base) {
+        return Math.round(base * (scale / 100)) + 'px';
+    }
 
-            var style = document.createElement('style');
-            style.textContent = [
-                '.Post-body, .Post-body p, .Post-body li,',
-                '.Post-body blockquote, .Post-body td, .Post-body th,',
-                '.Post-body pre, .Post-body code {',
-                '    font-size: ' + pct + ' !important;',
-                '}',
-                '.DiscussionHero .DiscussionHero-title,',
-                '.DiscussionPage .Hero-title,',
-                'h2.DiscussionListItem-title, h3.DiscussionListItem-title {',
-                '    font-size: ' + pct + ' !important;',
-                '}'
-            ].join('\n');
-            document.head.appendChild(style);
-        } catch (e) {}
+    function injectStyles() {
+        var old = document.getElementById('lr-font-sizer');
+        if (old) old.remove();
+
+        if (!scale || scale === 100) return;
+
+        var style = document.createElement('style');
+        style.id = 'lr-font-sizer';
+        style.textContent = [
+            '.Post-body, .Post-body p, .Post-body li,',
+            '.Post-body blockquote, .Post-body td, .Post-body th,',
+            '.Post-body pre, .Post-body code {',
+            '    font-size: ' + px(DEFAULTS.body) + ' !important;',
+            '}',
+
+            '.Hero h1, .DiscussionHero .DiscussionHero-title {',
+            '    font-size: ' + px(DEFAULTS.heroMobile) + ' !important;',
+            '}',
+            '@media (min-width: 768px) {',
+            '    .Hero h1, .DiscussionHero .DiscussionHero-title {',
+            '        font-size: ' + px(DEFAULTS.heroDesktop) + ' !important;',
+            '    }',
+            '}',
+            '.DiscussionListItem-title {',
+            '    font-size: ' + px(DEFAULTS.list) + ' !important;',
+            '}'
+        ].join('\n');
+        document.head.appendChild(style);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        scale = getScale();
+        injectStyles();
     });
 
-    app.initializers.add('linkrobins-font-sizer', function() {});
+    app.initializers.add('linkrobins-font-sizer', function() {
+        scale = getScale();
+        injectStyles();
+    });
 
 })();
 
