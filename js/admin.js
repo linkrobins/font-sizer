@@ -17,7 +17,7 @@
 
         var self = this;
 
-        // Read current saved value, fall back to 100 (default / all the way left)
+        
         var saved = parseInt(app.data.settings[SETTING_KEY] || MIN, 10);
 
         // Local mithril state stream so the slider re-renders live
@@ -29,7 +29,7 @@
             var val = parseInt(e.target.value, 10);
             self._scale = val;
 
-            // Apply instantly to the admin page itself so you can preview
+            
             document.documentElement.style.fontSize = val === MIN ? '' : val + '%';
 
             // Save instantly — no submit button needed
