@@ -20,7 +20,7 @@
         
         var saved = parseInt(app.data.settings[SETTING_KEY] || MIN, 10);
 
-        // Local mithril state stream so the slider re-renders live
+        
         if (!self._scale) {
             self._scale = saved;
         }
@@ -32,7 +32,7 @@
             
             document.documentElement.style.fontSize = val === MIN ? '' : val + '%';
 
-            // Save instantly — no submit button needed
+            
             var body = {};
             body[SETTING_KEY] = String(val);
             saveSettings(body).catch(function() {});
