@@ -10,10 +10,11 @@
     var UI_LARGE    = 115;
 
     var DEFAULTS = {
-        heroMobile:  16,
-        heroDesktop: 22,
-        body:        14,
-        list:        14
+        heroMobile:   16,
+        heroDesktop:  22,
+        body:         14,
+        listMobile:   14,
+        listDesktop:  16
     };
 
     // ── Cookie helpers ─────────────────────────────────────────────────────────
@@ -74,7 +75,8 @@
         s.textContent = [
             '.Post-body, .Post-body p, .Post-body li,',
             '.Post-body blockquote, .Post-body td, .Post-body th,',
-            '.Post-body pre, .Post-body code {',
+            '.Post-body pre, .Post-body code,',
+            '.item-excerpt, .DiscussionListItem-excerpt {',
             '    font-size: ' + px(DEFAULTS.body, textScale) + ' !important;',
             '}',
             '.Hero h1, .DiscussionHero .DiscussionHero-title {',
@@ -86,7 +88,12 @@
             '    }',
             '}',
             '.DiscussionListItem-title {',
-            '    font-size: ' + px(DEFAULTS.list, textScale) + ' !important;',
+            '    font-size: ' + px(DEFAULTS.listMobile, textScale) + ' !important;',
+            '}',
+            '@media (min-width: 768px) {',
+            '    .DiscussionListItem-title {',
+            '        font-size: ' + px(DEFAULTS.listDesktop, textScale) + ' !important;',
+            '    }',
             '}'
         ].join('\n');
         document.head.appendChild(s);
@@ -316,7 +323,7 @@
         resetBtn.onmouseout  = function() { resetBtn.style.color = 'var(--muted-color)'; };
         var adminDef   = getAdminDefault();
         var adminUIDef = getAdminUIDefault();
-        resetBtn.textContent = 'Reset to site default (' + adminDef + '%)';
+        resetBtn.textContent = 'Reset to site default';
         resetBtn.onclick = function() {
             var d  = getAdminDefault();
             var ui = getAdminUIDefault();
