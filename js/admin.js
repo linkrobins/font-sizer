@@ -40,12 +40,10 @@
             self._uiLarge = (app.data.settings[KEY_UI] === 'large');
         }
 
-        // ── Text scale input handler ──────────────────────────────────────────
         function onInput(e) {
             var val = parseInt(e.target.value, 10);
             self._scale = val;
 
-            // Live preview — text
             var ex = document.getElementById('lr-font-sizer-preview');
             if (val === MIN) {
                 if (ex) ex.remove();
@@ -67,7 +65,6 @@
             m.redraw();
         }
 
-        // ── UI size toggle handler ────────────────────────────────────────────
         function setUI(isLarge) {
             self._uiLarge = isLarge;
 
@@ -100,7 +97,6 @@
         return m('div', { className: 'ExtensionPage-settings' },
             m('div', { className: 'container' },
 
-                // ── Reading Text ──────────────────────────────────────────────
                 m('div', { className: 'Form-group' }, [
                     m('label', 'Default Reading Text Size'),
                     m('p', { className: 'helpText' },
@@ -136,7 +132,6 @@
                     }, 'Reset to 100%'),
                 ]),
 
-                // ── Interface Size ────────────────────────────────────────────
                 m('div', { className: 'Form-group' }, [
                     m('label', 'Default Interface Size'),
                     m('p', { className: 'helpText' },
