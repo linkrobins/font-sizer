@@ -14,4 +14,6 @@ return [
         ->serializeToForum('linkrobinsFontSizerUi',  'linkrobins-font-sizer.ui')
         ->default('linkrobins-font-sizer.scale', '100')
         ->default('linkrobins-font-sizer.ui',    'default'),
+
+    new Extend\Locales(__DIR__ . '/locale'),
 ];

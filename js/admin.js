@@ -6,6 +6,21 @@
     var ExtensionPage = flarum.reg.get('core', 'admin/components/ExtensionPage');
     var saveSettings  = flarum.reg.get('core', 'admin/utils/saveSettings');
 
+    // --- i18n helper ----------------------------------------------------
+    //
+    // tx() returns a plain extracted string from the translator (works
+    // for both `m()` text children and any attribute setters), and
+    // falls back to the raw key if the translator isn't ready yet.
+    function tx(key, params) {
+        try {
+            if (typeof app !== 'undefined' && app && app.translator
+                && typeof app.translator.trans === 'function') {
+                return app.translator.trans(key, params || {}, true);
+            }
+        } catch (e) {}
+        return key;
+    }
+
     var KEY_SCALE = 'linkrobins-font-sizer.scale';
     var KEY_UI    = 'linkrobins-font-sizer.ui';
     var MIN = 100;
@@ -92,16 +107,15 @@
 
         var current = self._scale;
         var uiLarge = self._uiLarge;
-        var label   = current + '%';
+        var label   = tx('linkrobins-font-sizer.admin.settings.text_size_value', { percent: current });
 
         return m('div', { className: 'ExtensionPage-settings' },
             m('div', { className: 'container' },
 
                 m('div', { className: 'Form-group' }, [
-                    m('label', 'Default Reading Text Size'),
+                    m('label', tx('linkrobins-font-sizer.admin.settings.text_size_label')),
                     m('p', { className: 'helpText' },
-                        'Sets the sitewide default for post body and title text. ' +
-                        'Users can override this with the Font Size button in the header.'
+                        tx('linkrobins-font-sizer.admin.settings.text_size_help')
                     ),
                     m('div', { style: 'display:flex;align-items:center;gap:1rem;margin-top:.5rem;' }, [
                         m('input', {
@@ -129,26 +143,25 @@
                             saveSettings(currentBody(MIN, self._uiLarge)).catch(function() {});
                             m.redraw();
                         },
-                    }, 'Reset to 100%'),
+                    }, tx('linkrobins-font-sizer.admin.settings.reset_button')),
                 ]),
 
                 m('div', { className: 'Form-group' }, [
-                    m('label', 'Default Interface Size'),
+                    m('label', tx('linkrobins-font-sizer.admin.settings.ui_size_label')),
                     m('p', { className: 'helpText' },
-                        'Sets the sitewide default for navigation, buttons, and UI elements. ' +
-                        'Users can override this with the Font Size button in the header.'
+                        tx('linkrobins-font-sizer.admin.settings.ui_size_help')
                     ),
                     m('div', { className: 'ButtonGroup', style: 'margin-top:.5rem;' }, [
                         m('button', {
                             type: 'button',
                             className: 'Button' + (!uiLarge ? ' Button--primary' : ''),
                             onclick: function() { setUI(false); },
-                        }, 'Default'),
+                        }, tx('linkrobins-font-sizer.admin.settings.ui_default')),
                         m('button', {
                             type: 'button',
                             className: 'Button' + (uiLarge ? ' Button--primary' : ''),
                             onclick: function() { setUI(true); },
-                        }, 'Large'),
+                        }, tx('linkrobins-font-sizer.admin.settings.ui_large')),
                     ]),
                 ])
             )

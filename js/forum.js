@@ -8,6 +8,25 @@
     var TEXT_MAX    = 150;
     var UI_LARGE    = 115;
 
+    // --- i18n helpers ---------------------------------------------------
+    //
+    // The modal is built with raw `document.createElement` and assigns
+    // strings via `.textContent`, not through Mithril -- so we always
+    // need a plain string back from the translator. tx() asks Flarum's
+    // translator for the extracted string form, and falls back to the
+    // key itself if the translator isn't ready yet (e.g. if the script
+    // somehow runs before `app.translator` is bound). The fallback keeps
+    // the UI rendering rather than throwing.
+    function tx(key, params) {
+        try {
+            if (typeof app !== 'undefined' && app && app.translator
+                && typeof app.translator.trans === 'function') {
+                return app.translator.trans(key, params || {}, true);
+            }
+        } catch (e) {}
+        return key;
+    }
+
     var DEFAULTS = {
         heroMobile:   16,
         heroDesktop:  22,
@@ -24,8 +43,29 @@
     function setCookie(name, value) {
         var expires = new Date();
         expires.setFullYear(expires.getFullYear() + 1);
+        // Add `Secure` on HTTPS pages so the cookie is never sent over
+        // plain HTTP. The cookie payload isn't sensitive (it's just a
+        // percentage or 'large'/'default'), but `Secure` is the
+        // standard hygiene and costs nothing on https sites; on http
+        // dev sites we leave it off so the cookie still applies.
+        var secure = '';
+        try {
+            if (typeof location !== 'undefined' && location.protocol === 'https:') {
+                secure = '; Secure';
+            }
+        } catch (e) {}
         document.cookie = name + '=' + encodeURIComponent(value) +
-            '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
+            '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
+    }
+
+    // Clamp a percent value to the [TEXT_MIN, TEXT_MAX] range. Used on
+    // cookie load so a stale or manually-tampered cookie can't produce
+    // 1000% text or `NaNpx` CSS output.
+    function clampScale(n) {
+        if (typeof n !== 'number' || isNaN(n)) return TEXT_MIN;
+        if (n < TEXT_MIN) return TEXT_MIN;
+        if (n > TEXT_MAX) return TEXT_MAX;
+        return n;
     }
 
     function getAdminDefault() {
@@ -51,7 +91,11 @@
     function loadState() {
         var cookieText = getCookie(COOKIE_TEXT);
         var cookieUI   = getCookie(COOKIE_UI);
-        textScale = cookieText !== null ? parseInt(cookieText, 10) : getAdminDefault();
+        // clampScale handles parseInt() returning NaN (garbage cookie)
+        // and out-of-range values, falling back to TEXT_MIN.
+        textScale = cookieText !== null
+            ? clampScale(parseInt(cookieText, 10))
+            : clampScale(getAdminDefault());
         uiLarge   = cookieUI   !== null ? (cookieUI === 'large')   : getAdminUIDefault();
     }
 
@@ -146,7 +190,7 @@
 
 
     function textLabel(val) {
-        return val + '%';
+        return tx('linkrobins-font-sizer.forum.modal.reading_text_value', { percent: val });
     }
 
     function openModal() {
@@ -177,10 +221,13 @@
 
         var titleEl = document.createElement('strong');
         titleEl.style.cssText = 'font-size:1rem;color:var(--heading-color,var(--body-color));';
-        titleEl.textContent = 'Text & UI Size';
+        titleEl.textContent = tx('linkrobins-font-sizer.forum.modal.title');
 
         var closeBtn = document.createElement('button');
         closeBtn.innerHTML = '&times;';
+        // Accessible label for the close button (screen-readers see this
+        // instead of the bare "×" glyph).
+        closeBtn.setAttribute('aria-label', tx('linkrobins-font-sizer.forum.modal.close_button_label'));
         closeBtn.style.cssText = [
             'background:none;border:none;cursor:pointer;',
             'font-size:1.4rem;line-height:1;padding:0;',
@@ -213,7 +260,7 @@
 
         var sec1 = document.createElement('div');
         sec1.style.marginBottom = '18px';
-        sec1.appendChild(sectionLabel('Reading Text'));
+        sec1.appendChild(sectionLabel(tx('linkrobins-font-sizer.forum.modal.reading_text_heading')));
 
         var sliderRow = document.createElement('div');
         sliderRow.style.cssText = 'display:flex;align-items:center;gap:12px;';
@@ -243,12 +290,12 @@
 
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:.75rem;color:var(--muted-color);margin-top:6px;';
-        hint.textContent = 'Affects post body and discussion titles.';
+        hint.textContent = tx('linkrobins-font-sizer.forum.modal.reading_text_hint');
         sec1.appendChild(hint);
 
         var sec2 = document.createElement('div');
         sec2.style.marginBottom = '20px';
-        sec2.appendChild(sectionLabel('Interface Size'));
+        sec2.appendChild(sectionLabel(tx('linkrobins-font-sizer.forum.modal.interface_size_heading')));
 
         var btnGroup = document.createElement('div');
         btnGroup.style.cssText = 'display:flex;gap:8px;';
@@ -279,13 +326,13 @@
             return { el: btn, refresh: refresh };
         }
 
-        var btnDef   = makeUIBtn('Default', false);
-        var btnLarge = makeUIBtn('Large',   true);
+        var btnDef   = makeUIBtn(tx('linkrobins-font-sizer.forum.modal.ui_default'), false);
+        var btnLarge = makeUIBtn(tx('linkrobins-font-sizer.forum.modal.ui_large'),   true);
         function refreshUIBtns() { btnDef.refresh(); btnLarge.refresh(); }
 
         var uiHint = document.createElement('div');
         uiHint.style.cssText = 'font-size:.75rem;color:var(--muted-color);margin-top:6px;';
-        uiHint.textContent = 'Affects navigation, buttons, and other UI elements.';
+        uiHint.textContent = tx('linkrobins-font-sizer.forum.modal.interface_size_hint');
 
         btnGroup.appendChild(btnDef.el);
         btnGroup.appendChild(btnLarge.el);
@@ -295,7 +342,7 @@
         var resetRow = document.createElement('div');
         resetRow.style.cssText = 'padding-top:12px;text-align:center;';
         var resetBtn = document.createElement('button');
-        resetBtn.textContent = 'Reset all to Flarum defaults';
+        resetBtn.textContent = tx('linkrobins-font-sizer.forum.modal.reset_button');
         resetBtn.style.cssText = [
             'background:none;border:none;cursor:pointer;',
             'font-size:.8rem;color:var(--muted-color);',
@@ -304,11 +351,8 @@
         ].join('');
         resetBtn.onmouseover = function() { resetBtn.style.color = 'var(--body-color)'; };
         resetBtn.onmouseout  = function() { resetBtn.style.color = 'var(--muted-color)'; };
-        var adminDef   = getAdminDefault();
-        var adminUIDef = getAdminUIDefault();
-        resetBtn.textContent = 'Reset to site default';
         resetBtn.onclick = function() {
-            var d  = getAdminDefault();
+            var d  = clampScale(getAdminDefault());
             var ui = getAdminUIDefault();
             textScale    = d;
             uiLarge      = ui;
@@ -356,13 +400,13 @@
                     m('button', {
                         type: 'button',
                         className: 'Button Button--flat',
-                        title: 'Font Size',
-                        'aria-label': 'Font Size',
+                        title: tx('linkrobins-font-sizer.forum.header_button.title'),
+                        'aria-label': tx('linkrobins-font-sizer.forum.header_button.title'),
                         onclick: openModal
                     },
                         m('i', { className: 'icon fas fa-text-height Button-icon', 'aria-hidden': 'true' }),
                         m('span', { className: 'Button-label' },
-                            m('span', { className: 'Button-labelText' }, 'Font Size')
+                            m('span', { className: 'Button-labelText' }, tx('linkrobins-font-sizer.forum.header_button.label'))
                         )
                     )
                 ),
