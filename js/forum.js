@@ -422,4 +422,3 @@
 
 })();
 
-module.exports = {};

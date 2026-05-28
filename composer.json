@@ -4,6 +4,7 @@
     "type": "flarum-extension",
     "license": "MIT",
     "require": {
+        "php": "^8.3",
         "flarum/core": "^2.0"
     },
     "extra": {

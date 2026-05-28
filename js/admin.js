@@ -32,7 +32,7 @@
     function debouncedSave(body) {
         if (saveTimer) clearTimeout(saveTimer);
         saveTimer = setTimeout(function() {
-            saveSettings(body).catch(function() {});
+            saveSettings(body).catch(function(e) { console.error('[linkrobins/font-sizer] settings save failed', e); });
         }, 500);
     }
 
@@ -101,7 +101,7 @@
             var body = {};
             body[KEY_SCALE] = String(self._scale);
             body[KEY_UI]    = isLarge ? 'large' : 'default';
-            saveSettings(body).catch(function() {});
+            saveSettings(body).catch(function(e) { console.error('[linkrobins/font-sizer] settings save failed', e); });
             m.redraw();
         }
 
@@ -112,7 +112,7 @@
         return m('div', { className: 'ExtensionPage-settings' },
             m('div', { className: 'container' },
 
-                m('div', { className: 'Form-group' }, [
+                m('div', { className: 'Form-group', style: 'margin-bottom:1.5rem;' }, [
                     m('label', tx('linkrobins-font-sizer.admin.settings.text_size_label')),
                     m('p', { className: 'helpText' },
                         tx('linkrobins-font-sizer.admin.settings.text_size_help')
@@ -140,7 +140,7 @@
                             var p = document.getElementById('lr-font-sizer-preview');
                             if (p) p.remove();
                             if (saveTimer) clearTimeout(saveTimer);
-                            saveSettings(currentBody(MIN, self._uiLarge)).catch(function() {});
+                            saveSettings(currentBody(MIN, self._uiLarge)).catch(function(e) { console.error('[linkrobins/font-sizer] settings save failed', e); });
                             m.redraw();
                         },
                     }, tx('linkrobins-font-sizer.admin.settings.reset_button')),
@@ -172,4 +172,3 @@
 
 })();
 
-module.exports = {};
