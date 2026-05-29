@@ -16,10 +16,5 @@
                 "color": "#07adcc"
             }
         }
-    },
-    "autoload": {
-        "psr-4": {
-            "LinkRobins\\FontSizer\\": "src/"
-        }
     }
 }

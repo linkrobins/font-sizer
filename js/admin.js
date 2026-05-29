@@ -27,6 +27,15 @@
     var MAX = 150;
     var UI_LARGE = 115;
 
+    // Clamp any value to the supported [MIN, MAX] range, mapping non-numeric
+    // input to MIN. Keeps a tampered field or stale setting from ever being
+    // saved out of range (the forum side and server also clamp).
+    function clamp(n) {
+        n = parseInt(n, 10);
+        if (isNaN(n)) return MIN;
+        return Math.max(MIN, Math.min(MAX, n));
+    }
+
     var saveTimer = null;
 
     function debouncedSave(body) {
@@ -51,12 +60,12 @@
         var self = this;
 
         if (self._scale === undefined) {
-            self._scale   = parseInt(app.data.settings[KEY_SCALE] || MIN, 10);
+            self._scale   = clamp(app.data.settings[KEY_SCALE]);
             self._uiLarge = (app.data.settings[KEY_UI] === 'large');
         }
 
         function onInput(e) {
-            var val = parseInt(e.target.value, 10);
+            var val = clamp(e.target.value);
             self._scale = val;
 
             var ex = document.getElementById('lr-font-sizer-preview');

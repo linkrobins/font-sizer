@@ -224,7 +224,9 @@
         titleEl.textContent = tx('linkrobins-font-sizer.forum.modal.title');
 
         var closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '&times;';
+        // Use textContent with the multiplication-sign glyph (×) rather than
+        // innerHTML, so there is no HTML-parsing sink anywhere in the modal.
+        closeBtn.textContent = '×';
         // Accessible label for the close button (screen-readers see this
         // instead of the bare "×" glyph).
         closeBtn.setAttribute('aria-label', tx('linkrobins-font-sizer.forum.modal.close_button_label'));
@@ -312,9 +314,14 @@
             ].join('');
             function refresh() {
                 var active = (uiLarge === isLarge);
-                btn.style.background = active ? 'var(--primary-color)' : 'var(--body-bg)';
-                btn.style.color      = active ? '#fff' : 'var(--body-color)';
-                btn.style.borderColor = active ? 'var(--primary-color)' : 'var(--control-color)';
+                // Mirror Flarum's own Button / Button--primary variables (the
+                // same ones the admin settings page relies on) rather than
+                // hardcoding '#fff'. `--button-primary-color` is the theme's
+                // computed text colour for the primary background, so this
+                // stays readable even when the admin picks a light primary.
+                btn.style.background  = active ? 'var(--button-primary-bg)'    : 'var(--button-bg)';
+                btn.style.color       = active ? 'var(--button-primary-color)' : 'var(--button-color)';
+                btn.style.borderColor = active ? 'var(--button-primary-bg)'    : 'var(--control-color)';
             }
             refresh();
             btn.onclick = function() {
@@ -395,6 +402,12 @@
         var HeaderSecondary = flarum.reg.get('core', 'forum/components/HeaderSecondary');
 
         extend(HeaderSecondary.prototype, 'items', function(items) {
+            // Place the control just before the profile block. For logged-in
+            // users, priority 5 sits between core's 'notifications' (10) and
+            // 'session'/avatar (0) -> immediately left of the avatar. For
+            // guests, priority 15 sits left of the 'signUp' (10) / 'logIn' (0)
+            // pair, keeping those buttons together rather than splitting them.
+            var priority = (app.session && app.session.user) ? 5 : 15;
             items.add('font-sizer',
                 m('div', { className: 'HeaderDropdown FontSizerDropdown' },
                     m('button', {
@@ -410,7 +423,7 @@
                         )
                     )
                 ),
-                -100
+                priority
             );
         });
     });
