@@ -3,6 +3,12 @@
     "description": "Accessibility-focused font size controls for Flarum 2.0. Users can adjust reading text size and interface size via a header button, with preferences saved in cookies. Admins set sitewide defaults from the extension settings.",
     "type": "flarum-extension",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Karl Bullock",
+            "email": "karl@linkrobins.com"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "flarum/core": "^2.0"
