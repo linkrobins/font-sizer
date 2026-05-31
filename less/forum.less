@@ -1,0 +1,48 @@
+// Font Sizer — forum styles.
+//
+// All layout lives here as overridable classes rather than inline `style`
+// attributes injected from JavaScript, so themes and other extensions can
+// restyle the control and modal the normal way.
+
+.FontSizerModal {
+  // Make the reading-size dropdown span the modal width like a normal
+  // Form-group field, instead of the Select's default inline-block width.
+  .FontSizerModal-select {
+    display: block;
+    margin-top: 4px;
+  }
+
+  // The reset link sits centered just under the primary "Done" button.
+  .FontSizerModal-reset {
+    display: block;
+    margin: 8px auto 0;
+  }
+}
+
+// Header control. On desktop, collapse to an icon-only square to sit neatly
+// among the other header buttons; on mobile (where it renders in the drawer
+// as a plain .Button rather than a .Dropdown-toggle) match the 7px icon/label
+// spacing that core's HeaderDropdown.less gives the native drawer items.
+.FontSizerDropdown {
+  @media (min-width: 768px) {
+    .Button-label {
+      display: none;
+    }
+
+    .Button {
+      width: 36px;
+      padding: 8px 0;
+    }
+
+    .Button-icon {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .Button-label {
+      margin-left: 7px;
+    }
+  }
+}

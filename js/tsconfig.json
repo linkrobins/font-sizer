@@ -1,4 +1,4 @@
 {
   "extends": "flarum-tsconfig",
-  "include": ["forum.js", "admin.js"]
+  "include": ["src/**/*", "forum.ts", "admin.ts"]
 }
