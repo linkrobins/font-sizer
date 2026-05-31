@@ -185,13 +185,14 @@
             ' .FontSizerDropdown .Button { width: 36px; padding: 8px 0; }' +
             ' .FontSizerDropdown .Button-icon { font-size: 16px; margin: 0; }' +
             ' }' +
-            // Mobile: native drawer items (.Dropdown-menu) use display:flex with
-            // gap:9px for the icon/label spacing, but our button is nested in an
-            // extra .HeaderDropdown wrapper so that core rule never reaches it,
-            // leaving the gap too small. Replicate it here so we match Drafts,
-            // Notifications, etc.
+            // Mobile: match native HeaderDropdown items (Notifications, Flagged
+            // Posts), which space the icon/label via
+            // `.HeaderDropdown .Dropdown-toggle .Button-label { margin-left: 7px }`
+            // (HeaderDropdown.less). Our toggle is a plain .Button, not a
+            // .Dropdown-toggle, so that core rule never reaches it — apply the
+            // same 7px here.
             '@media (max-width: 767px) {' +
-            ' .FontSizerDropdown .Button { display: flex; align-items: center; gap: 9px; }' +
+            ' .FontSizerDropdown .Button-label { margin-left: 7px; }' +
             ' }';
         document.head.appendChild(s);
     })();
