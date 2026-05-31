@@ -184,6 +184,14 @@
             ' .FontSizerDropdown .Button-label { display: none; }' +
             ' .FontSizerDropdown .Button { width: 36px; padding: 8px 0; }' +
             ' .FontSizerDropdown .Button-icon { font-size: 16px; margin: 0; }' +
+            ' }' +
+            // Mobile: native drawer items (.Dropdown-menu) use display:flex with
+            // gap:9px for the icon/label spacing, but our button is nested in an
+            // extra .HeaderDropdown wrapper so that core rule never reaches it,
+            // leaving the gap too small. Replicate it here so we match Drafts,
+            // Notifications, etc.
+            '@media (max-width: 767px) {' +
+            ' .FontSizerDropdown .Button { display: flex; align-items: center; gap: 9px; }' +
             ' }';
         document.head.appendChild(s);
     })();
