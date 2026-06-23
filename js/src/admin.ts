@@ -29,6 +29,25 @@ function persist(scale: number, uiLarge: boolean): Promise<unknown> {
   });
 }
 
+// Tiny trailing debounce so spinning the dropdown (or rapid toggles) coalesces
+// into a single PUT instead of one network write per step. The live preview and
+// stream updates stay synchronous; only the save is delayed. The handlers all
+// read the current streams, so the last call carries the full, correct state.
+function debounce<A extends unknown[]>(ms: number, fn: (...args: A) => void): (...args: A) => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return (...args: A) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      fn(...args);
+    }, ms);
+  };
+}
+
+const persistDebounced = debounce(300, (scale: number, uiLarge: boolean) => {
+  persist(scale, uiLarge);
+});
+
 // Build the `{ value: label }` map for the dropdown across the supported range,
 // always including the current value so a previously-saved off-grid value stays
 // selectable rather than rendering blank.
@@ -78,19 +97,19 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
     const val = clampScale(parseInt(value, 10));
     scaleStream(String(val));
     previewText(val);
-    persist(val, uiStream() === 'large');
+    persistDebounced(val, uiStream() === 'large');
   }
 
   function resetScale(): void {
     scaleStream(String(TEXT_MIN));
     previewText(TEXT_MIN);
-    persist(TEXT_MIN, uiStream() === 'large');
+    persistDebounced(TEXT_MIN, uiStream() === 'large');
   }
 
   function setUi(large: boolean): void {
     uiStream(large ? 'large' : 'default');
     previewUi(large);
-    persist(clampScale(parseInt(scaleStream(), 10)), large);
+    persistDebounced(clampScale(parseInt(scaleStream(), 10)), large);
   }
 
   return m('div', { className: 'ExtensionPage-settings' },
