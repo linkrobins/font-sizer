@@ -10,3 +10,30 @@
   margin-top: 0.5rem;
   font-size: 0.8rem;
 }
+
+.FontSizerSettings-preview {
+  margin-top: 1.5rem;
+}
+
+.FontSizerSettings-previewBox {
+  margin-top: 0.5rem;
+  padding: 16px;
+  border: 1px solid var(--control-bg, #e8eaed);
+  border-radius: var(--border-radius, 4px);
+
+  p {
+    margin: 0 0 12px;
+  }
+}
+
+// Only the preview sample scales on the settings page (it carries the contract
+// classes), so the surrounding admin UI stays put while previewing. The same
+// `--lr-text-scale` / `--lr-ui-scale` variables and gate classes that the forum
+// uses drive it, toggled on <html> by the preview handlers.
+html.lr-text-scaling .FontSizer-text {
+  font-size: calc(1em * var(--lr-text-scale, 1)) !important;
+}
+
+html.lr-ui-scaling .FontSizer-ui {
+  font-size: calc(1em * var(--lr-ui-scale, 1)) !important;
+}

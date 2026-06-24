@@ -8,7 +8,7 @@ import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
 import { TEXT_MIN, TEXT_MAX, clampScale } from './constants';
-import { buildTextCss, buildUiCss, injectStyle, removeStyle } from './styles';
+import { applyTextScale, applyUiScale } from './styles';
 
 const EXTENSION_ID = 'linkrobins-font-sizer';
 const KEY_SCALE = 'linkrobins-font-sizer.scale';
@@ -16,9 +16,6 @@ const KEY_UI = 'linkrobins-font-sizer.ui';
 
 // Granularity of the reading-size dropdown (matches the forum modal).
 const STEP = 5;
-
-const TEXT_PREVIEW_ID = 'lr-font-sizer-preview';
-const UI_PREVIEW_ID = 'lr-ui-sizer-preview';
 
 function persist(scale: number, uiLarge: boolean): Promise<unknown> {
   const body: Record<string, string> = {};
@@ -66,17 +63,17 @@ function scaleOptions(current: number): Record<string, string> {
   return options;
 }
 
-// The preview reuses the exact builders the forum runs, so the admin preview
-// can't drift from real output. (On the settings page few of these selectors
-// match anything, but keeping them identical avoids a second source of truth.)
+// The preview reuses the exact apply path the forum runs (toggling the gate
+// classes + variables on <html>), so it can't drift from real output. The
+// scaling rules are mirrored in admin.less, and the settings page renders a
+// sample with the FontSizer-text / FontSizer-ui classes so dragging the
+// controls actually shows the effect.
 function previewText(scale: number): void {
-  if (scale === TEXT_MIN) removeStyle(TEXT_PREVIEW_ID);
-  else injectStyle(TEXT_PREVIEW_ID, buildTextCss(scale));
+  applyTextScale(scale);
 }
 
 function previewUi(uiLarge: boolean): void {
-  if (!uiLarge) removeStyle(UI_PREVIEW_ID);
-  else injectStyle(UI_PREVIEW_ID, buildUiCss());
+  applyUiScale(uiLarge);
 }
 
 override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, original: () => Mithril.Children) {
@@ -149,6 +146,22 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
           },
           app.translator.trans('linkrobins-font-sizer.admin.settings.ui_toggle_label')
         ),
+      ]),
+
+      // --- Live preview --------------------------------------------------
+      // The sample carries the same FontSizer-text / FontSizer-ui contract
+      // classes the forum exposes to extensions, so dragging the controls
+      // above scales it exactly the way real content scales.
+      m('div', { className: 'Form-group FontSizerSettings-preview' }, [
+        m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.preview_label')),
+        m('div', { className: 'FontSizerSettings-previewBox' }, [
+          m('p', { className: 'FontSizer-text' },
+            app.translator.trans('linkrobins-font-sizer.admin.settings.preview_text')
+          ),
+          m('button', { className: 'Button FontSizer-ui', type: 'button' },
+            app.translator.trans('linkrobins-font-sizer.admin.settings.preview_button')
+          ),
+        ]),
       ]),
     ])
   );

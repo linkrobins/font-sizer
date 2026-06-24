@@ -46,3 +46,8 @@ linkrobins-font-sizer:
       ui_size_label: "Default Interface Size"
       ui_size_help: "Sets the sitewide default for navigation, buttons, and UI elements. Users can override this with the Font Size button in the header."
       ui_toggle_label: "Use a larger interface"
+
+      # Live preview
+      preview_label: "Preview"
+      preview_text: "The quick brown fox jumps over the lazy dog. This sample reading text scales with the setting above."
+      preview_button: "Sample button"
