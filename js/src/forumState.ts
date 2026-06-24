@@ -7,10 +7,7 @@
  */
 import app from 'flarum/forum/app';
 import { COOKIE_TEXT, COOKIE_UI, TEXT_MIN, clampScale } from './constants';
-import { buildTextCss, buildUiCss, injectStyle, removeStyle } from './styles';
-
-const TEXT_STYLE_ID = 'lr-text-sizer';
-const UI_STYLE_ID = 'lr-ui-sizer';
+import { applyTextScale, applyUiScale } from './styles';
 
 export const state = {
   textScale: TEXT_MIN,
@@ -77,19 +74,11 @@ export function loadState(): void {
 }
 
 export function applyText(): void {
-  if (state.textScale === TEXT_MIN) {
-    removeStyle(TEXT_STYLE_ID);
-    return;
-  }
-  injectStyle(TEXT_STYLE_ID, buildTextCss(state.textScale));
+  applyTextScale(state.textScale);
 }
 
 export function applyUi(): void {
-  if (!state.uiLarge) {
-    removeStyle(UI_STYLE_ID);
-    return;
-  }
-  injectStyle(UI_STYLE_ID, buildUiCss());
+  applyUiScale(state.uiLarge);
 }
 
 export function applyAll(): void {

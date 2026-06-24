@@ -46,3 +46,92 @@
     }
   }
 }
+
+// === Scaling ===============================================================
+//
+// The rules below are gated behind a class the extension toggles on <html>
+// (`lr-text-scaling` / `lr-ui-scaling`), so at the default size nothing here
+// applies and the theme renders untouched. Each rule scales relative to the
+// element's own inherited size via the `--lr-text-scale` / `--lr-ui-scale`
+// custom properties, so it follows whatever sizes the theme uses instead of
+// asserting a fixed pixel base.
+//
+// THE EXTENSION CONTRACT: any other extension can join the scaling by adding
+// the `FontSizer-text` class to a readable-content root, or `FontSizer-ui` to
+// a chrome element. The variables are also published on :root, so authors who
+// prefer can write `font-size: calc(1em * var(--lr-text-scale, 1))` directly.
+
+// --- Reading text ---
+// Core's own elements scale from their known pixel base times the variable, so
+// a large title scales up (rather than collapsing toward the smaller inherited
+// size, which `1em` would do). Extension content uses the `FontSizer-text`
+// class, which scales relative to its own inherited size -- correct for the
+// body-sized readable text the contract is meant for.
+html.lr-text-scaling {
+  .Post-body,
+  .Post-body p,
+  .Post-body li,
+  .Post-body blockquote,
+  .Post-body td,
+  .Post-body th {
+    font-size: calc(14px * var(--lr-text-scale, 1)) !important;
+  }
+
+  .item-excerpt,
+  .DiscussionListItem-excerpt {
+    font-size: calc(12px * var(--lr-text-scale, 1)) !important;
+  }
+
+  .Hero h1,
+  .DiscussionHero .DiscussionHero-title {
+    font-size: calc(16px * var(--lr-text-scale, 1)) !important;
+  }
+
+  .DiscussionListItem-title {
+    font-size: calc(14px * var(--lr-text-scale, 1)) !important;
+  }
+
+  @media (min-width: 768px) {
+    .Hero h1,
+    .DiscussionHero .DiscussionHero-title {
+      font-size: calc(22px * var(--lr-text-scale, 1)) !important;
+    }
+
+    .DiscussionListItem-title {
+      font-size: calc(16px * var(--lr-text-scale, 1)) !important;
+    }
+  }
+
+  // Extension opt-in: scales relative to the element's own inherited size.
+  .FontSizer-text {
+    font-size: calc(1em * var(--lr-text-scale, 1)) !important;
+  }
+}
+
+// --- Interface ("Large" mode) ---
+html.lr-ui-scaling {
+  #header .Button,
+  #header .LinksButton,
+  .DiscussionPage-nav .Button,
+  .item-nav .Button,
+  .item-nav .LinkButton,
+  .item-nav .TagLinkButton {
+    font-size: calc(14px * var(--lr-ui-scale, 1)) !important;
+  }
+
+  .Button:not(.Post-body .Button),
+  .App-footer,
+  #modern-footer {
+    font-size: calc(13px * var(--lr-ui-scale, 1)) !important;
+  }
+
+  .TagLabel-name,
+  .DiscussionListItem-info {
+    font-size: calc(12px * var(--lr-ui-scale, 1)) !important;
+  }
+
+  // Extension opt-in.
+  .FontSizer-ui {
+    font-size: calc(1em * var(--lr-ui-scale, 1)) !important;
+  }
+}
