@@ -34,9 +34,7 @@ function setCookie(name: string, value: string): void {
   } catch (e) {
     // location unavailable — leave Secure off.
   }
-  document.cookie =
-    name + '=' + encodeURIComponent(value) +
-    '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
+  document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax' + secure;
 }
 
 /**
@@ -50,7 +48,7 @@ function forumAttribute(name: string): string | undefined {
   if (forum && typeof forum.attribute === 'function') {
     return forum.attribute(name) as string | undefined;
   }
-  const resources = ((app.data as { resources?: Array<{ type?: string; attributes?: Record<string, unknown> }> })?.resources) ?? [];
+  const resources = (app.data as { resources?: Array<{ type?: string; attributes?: Record<string, unknown> }> })?.resources ?? [];
   const forumRecord = resources.find((r) => r && r.type === 'forums');
   return forumRecord?.attributes?.[name] as string | undefined;
 }

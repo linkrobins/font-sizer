@@ -23,7 +23,9 @@ app.initializers.add('linkrobins-font-sizer', () => {
 
     items.add(
       'font-sizer',
-      m('div', { className: 'HeaderDropdown FontSizerDropdown' },
+      m(
+        'div',
+        { className: 'HeaderDropdown FontSizerDropdown' },
         Button.component(
           {
             className: 'Button Button--flat',

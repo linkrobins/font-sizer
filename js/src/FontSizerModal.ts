@@ -34,7 +34,9 @@ export default class FontSizerModal extends Modal {
   }
 
   content(): Mithril.Children {
-    return m('div', { className: 'Modal-body' },
+    return m(
+      'div',
+      { className: 'Modal-body' },
       m('div', { className: 'Form' }, [
         // --- Reading text size --------------------------------------------
         m('div', { className: 'Form-group' }, [
@@ -45,9 +47,7 @@ export default class FontSizerModal extends Modal {
             wrapperAttrs: { className: 'FontSizerModal-select' },
             onchange: (value: string) => setTextScale(parseInt(value, 10)),
           }),
-          m('p', { className: 'helpText' },
-            app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_hint')
-          ),
+          m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_hint')),
         ]),
 
         // --- Interface size -----------------------------------------------
@@ -59,13 +59,13 @@ export default class FontSizerModal extends Modal {
             },
             app.translator.trans('linkrobins-font-sizer.forum.modal.interface_size_label')
           ),
-          m('p', { className: 'helpText' },
-            app.translator.trans('linkrobins-font-sizer.forum.modal.interface_size_hint')
-          ),
+          m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.forum.modal.interface_size_hint')),
         ]),
 
         // --- Actions ------------------------------------------------------
-        m('div', { className: 'Form-group Form-controls' },
+        m(
+          'div',
+          { className: 'Form-group Form-controls' },
           Button.component(
             {
               className: 'Button Button--link FontSizerModal-reset',
@@ -93,11 +93,7 @@ export default class FontSizerModal extends Modal {
       .map(Number)
       .sort((a, b) => a - b)
       .forEach((v) => {
-        options[String(v)] = app.translator.trans(
-          'linkrobins-font-sizer.forum.modal.reading_text_value',
-          { percent: v },
-          true
-        );
+        options[String(v)] = app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_value', { percent: v }, true);
       });
     return options;
   }

@@ -109,14 +109,14 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
     persistDebounced(clampScale(parseInt(scaleStream(), 10)), large);
   }
 
-  return m('div', { className: 'ExtensionPage-settings' },
+  return m(
+    'div',
+    { className: 'ExtensionPage-settings' },
     m('div', { className: 'container' }, [
       // --- Default reading text size ------------------------------------
       m('div', { className: 'Form-group', style: 'margin-bottom:1.5rem;' }, [
         m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.text_size_label')),
-        m('p', { className: 'helpText' },
-          app.translator.trans('linkrobins-font-sizer.admin.settings.text_size_help')
-        ),
+        m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.admin.settings.text_size_help')),
         Select.component({
           options: scaleOptions(scale),
           value: String(scale),
@@ -136,9 +136,7 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
       // --- Default interface size ---------------------------------------
       m('div', { className: 'Form-group' }, [
         m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.ui_size_label')),
-        m('p', { className: 'helpText' },
-          app.translator.trans('linkrobins-font-sizer.admin.settings.ui_size_help')
-        ),
+        m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.admin.settings.ui_size_help')),
         Switch.component(
           {
             state: uiLarge,
@@ -155,10 +153,10 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
       m('div', { className: 'Form-group FontSizerSettings-preview' }, [
         m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.preview_label')),
         m('div', { className: 'FontSizerSettings-previewBox' }, [
-          m('p', { className: 'FontSizer-text' },
-            app.translator.trans('linkrobins-font-sizer.admin.settings.preview_text')
-          ),
-          m('button', { className: 'Button FontSizer-ui', type: 'button' },
+          m('p', { className: 'FontSizer-text' }, app.translator.trans('linkrobins-font-sizer.admin.settings.preview_text')),
+          m(
+            'button',
+            { className: 'Button FontSizer-ui', type: 'button' },
             app.translator.trans('linkrobins-font-sizer.admin.settings.preview_button')
           ),
         ]),
