@@ -4,6 +4,10 @@ on: [workflow_dispatch, push, pull_request]
 
 jobs:
   run:
+    # The reusable workflow commits a rebuilt js/dist back to the branch
+    # when it drifts from source, which needs write access.
+    permissions:
+      contents: write
     uses: flarum/framework/.github/workflows/REUSABLE_frontend.yml@2.x
     with:
       enable_bundlewatch: false
