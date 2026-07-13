@@ -26,10 +26,61 @@
   }
 }
 
-// Only the preview sample scales on the settings page (it carries the contract
-// classes), so the surrounding admin UI stays put while previewing. The same
-// `--lr-text-scale` / `--lr-ui-scale` variables and gate classes that the forum
-// uses drive it, toggled on <html> by the preview handlers.
+// The three base-size inputs sit side by side.
+.FontSizerSettings-bases {
+  display: flex;
+  gap: 12px;
+  margin-top: 0.5rem;
+
+  .FontSizerSettings-baseField {
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: normal;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 90px;
+    }
+  }
+}
+
+// Preview text lines at the forum's default sizes, so the sample is accurate
+// before any setting is touched.
+.FontSizerPreview-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.FontSizerPreview-body {
+  font-size: 14px;
+}
+
+.FontSizerPreview-small {
+  font-size: 12px;
+  color: var(--muted-color, #667);
+}
+
+// Only the preview sample scales on the settings page, so the surrounding
+// admin UI stays put while previewing. The same variables and gate classes
+// that the forum uses drive it, toggled on <html> by the preview handlers,
+// and the formulas mirror the title/body/excerpt rules in forum.less exactly.
+html.lr-text-scaling,
+html.lr-text-bases {
+  .FontSizerPreview-title {
+    font-size: calc(var(--lr-text-title, 16px) * var(--lr-text-scale, 1)) !important;
+  }
+
+  .FontSizerPreview-body {
+    font-size: calc(var(--lr-text-base, 14px) * var(--lr-text-scale, 1)) !important;
+  }
+
+  .FontSizerPreview-small {
+    font-size: calc(var(--lr-text-small, 12px) * var(--lr-text-scale, 1)) !important;
+  }
+}
+
 html.lr-text-scaling .FontSizer-text {
   font-size: calc(1em * var(--lr-text-scale, 1)) !important;
 }

@@ -23,8 +23,23 @@ return [
         ->serializeToForum('linkrobinsFontSizerUi', 'linkrobins-font-sizer.ui', function ($value) {
             return $value === 'large' ? 'large' : 'default';
         })
+        // Base sizes (px) that scaling multiplies. Clamped to the same
+        // 10-32px range the admin inputs allow; the stylesheet falls back to
+        // the historical defaults (14/12/16) when these match them.
+        ->serializeToForum('linkrobinsFontSizerTextBase', 'linkrobins-font-sizer.text_base', function ($value) {
+            return (string) max(10, min(32, (int) $value));
+        })
+        ->serializeToForum('linkrobinsFontSizerTextSmall', 'linkrobins-font-sizer.text_small', function ($value) {
+            return (string) max(10, min(32, (int) $value));
+        })
+        ->serializeToForum('linkrobinsFontSizerTextTitle', 'linkrobins-font-sizer.text_title', function ($value) {
+            return (string) max(10, min(32, (int) $value));
+        })
         ->default('linkrobins-font-sizer.scale', '100')
-        ->default('linkrobins-font-sizer.ui',    'default'),
+        ->default('linkrobins-font-sizer.ui',    'default')
+        ->default('linkrobins-font-sizer.text_base',  '14')
+        ->default('linkrobins-font-sizer.text_small', '12')
+        ->default('linkrobins-font-sizer.text_title', '16'),
 
     new Extend\Locales(__DIR__ . '/locale'),
 ];

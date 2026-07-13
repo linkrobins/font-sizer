@@ -6,8 +6,8 @@
  * from the forum payload, and (re)applies the generated stylesheets.
  */
 import app from 'flarum/forum/app';
-import { COOKIE_TEXT, COOKIE_UI, TEXT_MIN, clampScale } from './constants';
-import { applyTextScale, applyUiScale } from './styles';
+import { COOKIE_TEXT, COOKIE_UI, TEXT_MIN, BASE_DEFAULTS, clampScale, clampBase } from './constants';
+import { applyTextScale, applyTextBases, applyUiScale, type TextBases } from './styles';
 
 export const state = {
   textScale: TEXT_MIN,
@@ -63,6 +63,19 @@ export function adminDefaultUi(): boolean {
   return forumAttribute('linkrobinsFontSizerUi') === 'large';
 }
 
+/**
+ * Admin-configured base sizes. Unlike scale and UI size these carry no user
+ * override (no cookie): they describe the theme's starting sizes, so they are
+ * read from the payload and applied once at boot.
+ */
+export function adminBases(): TextBases {
+  return {
+    base: clampBase(parseInt(forumAttribute('linkrobinsFontSizerTextBase') ?? '', 10), BASE_DEFAULTS.base),
+    small: clampBase(parseInt(forumAttribute('linkrobinsFontSizerTextSmall') ?? '', 10), BASE_DEFAULTS.small),
+    title: clampBase(parseInt(forumAttribute('linkrobinsFontSizerTextTitle') ?? '', 10), BASE_DEFAULTS.title),
+  };
+}
+
 /** Resolve the effective state from cookies, falling back to admin defaults. */
 export function loadState(): void {
   const cookieText = getCookie(COOKIE_TEXT);
@@ -81,6 +94,7 @@ export function applyUi(): void {
 
 export function applyAll(): void {
   applyText();
+  applyTextBases(adminBases());
   applyUi();
 }
 

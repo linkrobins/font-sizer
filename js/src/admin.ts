@@ -7,20 +7,29 @@ import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
-import { TEXT_MIN, TEXT_MAX, clampScale } from './constants';
-import { applyTextScale, applyUiScale } from './styles';
+import { TEXT_MIN, TEXT_MAX, BASE_DEFAULTS, BASE_MIN, BASE_MAX, clampScale, clampBase } from './constants';
+import { applyTextScale, applyTextBases, applyUiScale, type TextBases } from './styles';
 
 const EXTENSION_ID = 'linkrobins-font-sizer';
 const KEY_SCALE = 'linkrobins-font-sizer.scale';
 const KEY_UI = 'linkrobins-font-sizer.ui';
 
+const BASE_KEYS: Record<keyof TextBases, string> = {
+  base: 'linkrobins-font-sizer.text_base',
+  small: 'linkrobins-font-sizer.text_small',
+  title: 'linkrobins-font-sizer.text_title',
+};
+
 // Granularity of the reading-size dropdown (matches the forum modal).
 const STEP = 5;
 
-function persist(scale: number, uiLarge: boolean): Promise<unknown> {
+function persist(scale: number, uiLarge: boolean, bases: TextBases): Promise<unknown> {
   const body: Record<string, string> = {};
   body[KEY_SCALE] = String(scale);
   body[KEY_UI] = uiLarge ? 'large' : 'default';
+  (Object.keys(BASE_KEYS) as Array<keyof TextBases>).forEach((k) => {
+    body[BASE_KEYS[k]] = String(bases[k]);
+  });
   return saveSettings(body).catch((e: unknown) => {
     console.error('[linkrobins/font-sizer] settings save failed', e);
   });
@@ -41,8 +50,8 @@ function debounce<A extends unknown[]>(ms: number, fn: (...args: A) => void): (.
   };
 }
 
-const persistDebounced = debounce(300, (scale: number, uiLarge: boolean) => {
-  persist(scale, uiLarge);
+const persistDebounced = debounce(300, (scale: number, uiLarge: boolean, bases: TextBases) => {
+  persist(scale, uiLarge, bases);
 });
 
 // Build the `{ value: label }` map for the dropdown across the supported range,
@@ -72,6 +81,10 @@ function previewText(scale: number): void {
   applyTextScale(scale);
 }
 
+function previewBases(bases: TextBases): void {
+  applyTextBases(bases);
+}
+
 function previewUi(uiLarge: boolean): void {
   applyUiScale(uiLarge);
 }
@@ -86,27 +99,77 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
   // `app.data.settings` payload.
   const scaleStream = this.setting(KEY_SCALE, String(TEXT_MIN));
   const uiStream = this.setting(KEY_UI, 'default');
+  const baseStreams = {
+    base: this.setting(BASE_KEYS.base, String(BASE_DEFAULTS.base)),
+    small: this.setting(BASE_KEYS.small, String(BASE_DEFAULTS.small)),
+    title: this.setting(BASE_KEYS.title, String(BASE_DEFAULTS.title)),
+  };
 
   const scale = clampScale(parseInt(scaleStream(), 10));
   const uiLarge = uiStream() === 'large';
+
+  // Streams hold whatever is in the input (possibly a half-typed value);
+  // reading through the clamp yields the effective sizes used for preview
+  // and persistence. The server clamps again on save.
+  function readBases(): TextBases {
+    return {
+      base: clampBase(parseInt(baseStreams.base(), 10), BASE_DEFAULTS.base),
+      small: clampBase(parseInt(baseStreams.small(), 10), BASE_DEFAULTS.small),
+      title: clampBase(parseInt(baseStreams.title(), 10), BASE_DEFAULTS.title),
+    };
+  }
 
   function onScale(value: string): void {
     const val = clampScale(parseInt(value, 10));
     scaleStream(String(val));
     previewText(val);
-    persistDebounced(val, uiStream() === 'large');
+    persistDebounced(val, uiStream() === 'large', readBases());
   }
 
   function resetScale(): void {
     scaleStream(String(TEXT_MIN));
     previewText(TEXT_MIN);
-    persistDebounced(TEXT_MIN, uiStream() === 'large');
+    persistDebounced(TEXT_MIN, uiStream() === 'large', readBases());
+  }
+
+  function onBase(key: keyof TextBases, value: string): void {
+    baseStreams[key](value);
+    previewBases(readBases());
+    persistDebounced(clampScale(parseInt(scaleStream(), 10)), uiStream() === 'large', readBases());
+  }
+
+  function resetBases(): void {
+    (Object.keys(baseStreams) as Array<keyof TextBases>).forEach((k) => {
+      baseStreams[k](String(BASE_DEFAULTS[k]));
+    });
+    previewBases(readBases());
+    persistDebounced(clampScale(parseInt(scaleStream(), 10)), uiStream() === 'large', readBases());
   }
 
   function setUi(large: boolean): void {
     uiStream(large ? 'large' : 'default');
     previewUi(large);
-    persistDebounced(clampScale(parseInt(scaleStream(), 10)), large);
+    persistDebounced(clampScale(parseInt(scaleStream(), 10)), large, readBases());
+  }
+
+  const bases = readBases();
+  const basesCustomized = bases.base !== BASE_DEFAULTS.base || bases.small !== BASE_DEFAULTS.small || bases.title !== BASE_DEFAULTS.title;
+
+  // One labelled px input per base size. The stream holds the raw input text
+  // so typing isn't fought; preview and persistence read the clamped value.
+  function baseInput(key: keyof TextBases, labelKey: string): Mithril.Children {
+    return m('div', { className: 'FontSizerSettings-baseField' }, [
+      m('label', app.translator.trans(`linkrobins-font-sizer.admin.settings.${labelKey}`)),
+      m('input', {
+        className: 'FormControl',
+        type: 'number',
+        min: BASE_MIN,
+        max: BASE_MAX,
+        step: 1,
+        value: baseStreams[key](),
+        oninput: (e: InputEvent) => onBase(key, (e.target as HTMLInputElement).value),
+      }),
+    ]);
   }
 
   return m(
@@ -133,6 +196,29 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
           ),
       ]),
 
+      // --- Base text sizes -------------------------------------------------
+      // The px starting points the scale multiplies. At the defaults the
+      // extension asserts nothing; once customized they apply sitewide (even
+      // for users at 100%), which is what lets admins size the forum for a
+      // font that runs small without writing Custom CSS.
+      m('div', { className: 'Form-group', style: 'margin-bottom:1.5rem;' }, [
+        m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.bases_label')),
+        m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.admin.settings.bases_help')),
+        m('div', { className: 'FontSizerSettings-bases' }, [
+          baseInput('base', 'base_input_label'),
+          baseInput('small', 'small_input_label'),
+          baseInput('title', 'title_input_label'),
+        ]),
+        basesCustomized &&
+          Button.component(
+            {
+              className: 'Button Button--text FontSizerSettings-reset',
+              onclick: resetBases,
+            },
+            app.translator.trans('linkrobins-font-sizer.admin.settings.bases_reset_button')
+          ),
+      ]),
+
       // --- Default interface size ---------------------------------------
       m('div', { className: 'Form-group' }, [
         m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.ui_size_label')),
@@ -147,13 +233,16 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
       ]),
 
       // --- Live preview --------------------------------------------------
-      // The sample carries the same FontSizer-text / FontSizer-ui contract
-      // classes the forum exposes to extensions, so dragging the controls
-      // above scales it exactly the way real content scales.
+      // The text lines mirror the forum's title/body/excerpt rules (same
+      // base-variable formulas, in admin.less), so both the scale dropdown
+      // and the base inputs preview exactly the way real content renders.
+      // The button carries the FontSizer-ui contract class.
       m('div', { className: 'Form-group FontSizerSettings-preview' }, [
         m('label', app.translator.trans('linkrobins-font-sizer.admin.settings.preview_label')),
         m('div', { className: 'FontSizerSettings-previewBox' }, [
-          m('p', { className: 'FontSizer-text' }, app.translator.trans('linkrobins-font-sizer.admin.settings.preview_text')),
+          m('p', { className: 'FontSizerPreview-title' }, app.translator.trans('linkrobins-font-sizer.admin.settings.preview_title')),
+          m('p', { className: 'FontSizerPreview-body' }, app.translator.trans('linkrobins-font-sizer.admin.settings.preview_text')),
+          m('p', { className: 'FontSizerPreview-small' }, app.translator.trans('linkrobins-font-sizer.admin.settings.preview_small')),
           m(
             'button',
             { className: 'Button FontSizer-ui', type: 'button' },

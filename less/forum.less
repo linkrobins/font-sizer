@@ -49,12 +49,24 @@
 
 // === Scaling ===============================================================
 //
-// The rules below are gated behind a class the extension toggles on <html>
-// (`lr-text-scaling` / `lr-ui-scaling`), so at the default size nothing here
-// applies and the theme renders untouched. Each rule scales relative to the
-// element's own inherited size via the `--lr-text-scale` / `--lr-ui-scale`
-// custom properties, so it follows whatever sizes the theme uses instead of
-// asserting a fixed pixel base.
+// The rules below are gated behind classes the extension toggles on <html>,
+// so at the default settings nothing here applies and the theme renders
+// untouched. Two independent gates cover reading text:
+//
+//   `lr-text-scaling` -- a user picked a reading size above 100%
+//                        (`--lr-text-scale` carries the multiplier).
+//   `lr-text-bases`   -- the admin customised one or more base sizes
+//                        (`--lr-text-base` / `--lr-text-small` /
+//                        `--lr-text-title` carry pixel values).
+//
+// Either gate activates the pixel rules below; each rule multiplies its base
+// variable (which falls back to the historical default) by the scale variable
+// (which falls back to 1). So admin-customised bases apply sitewide even at
+// 100%, user scaling multiplies on top of whatever base is in effect, and
+// with both at their defaults the output is untouched. The base variables are
+// only asserted inline when the admin changes them, so a theme can also set
+// them from Custom CSS (`:root { --lr-text-base: 16px; }`) to tell the
+// extension what its scaling should start from.
 //
 // THE EXTENSION CONTRACT: any other extension can join the scaling by adding
 // the `FontSizer-text` class to a readable-content root, or `FontSizer-ui` to
@@ -64,45 +76,51 @@
 // --- Reading text ---
 // Core's own elements scale from their known pixel base times the variable, so
 // a large title scales up (rather than collapsing toward the smaller inherited
-// size, which `1em` would do). Extension content uses the `FontSizer-text`
-// class, which scales relative to its own inherited size -- correct for the
-// body-sized readable text the contract is meant for.
-html.lr-text-scaling {
+// size, which `1em` would do). The desktop title keeps its historical 16:22
+// ratio by deriving from the title base (16px * 1.375 = 22px).
+html.lr-text-scaling,
+html.lr-text-bases {
   .Post-body,
   .Post-body p,
   .Post-body li,
   .Post-body blockquote,
   .Post-body td,
   .Post-body th {
-    font-size: calc(14px * var(--lr-text-scale, 1)) !important;
+    font-size: calc(var(--lr-text-base, 14px) * var(--lr-text-scale, 1)) !important;
   }
 
   .item-excerpt,
   .DiscussionListItem-excerpt {
-    font-size: calc(12px * var(--lr-text-scale, 1)) !important;
+    font-size: calc(var(--lr-text-small, 12px) * var(--lr-text-scale, 1)) !important;
   }
 
   .Hero h1,
   .DiscussionHero .DiscussionHero-title {
-    font-size: calc(16px * var(--lr-text-scale, 1)) !important;
+    font-size: calc(var(--lr-text-title, 16px) * var(--lr-text-scale, 1)) !important;
   }
 
   .DiscussionListItem-title {
-    font-size: calc(14px * var(--lr-text-scale, 1)) !important;
+    font-size: calc(var(--lr-text-base, 14px) * var(--lr-text-scale, 1)) !important;
   }
 
   @media (min-width: 768px) {
     .Hero h1,
     .DiscussionHero .DiscussionHero-title {
-      font-size: calc(22px * var(--lr-text-scale, 1)) !important;
+      font-size: calc(var(--lr-text-title, 16px) * 1.375 * var(--lr-text-scale, 1)) !important;
     }
 
     .DiscussionListItem-title {
-      font-size: calc(16px * var(--lr-text-scale, 1)) !important;
+      font-size: calc(var(--lr-text-title, 16px) * var(--lr-text-scale, 1)) !important;
     }
   }
+}
 
-  // Extension opt-in: scales relative to the element's own inherited size.
+// Extension opt-in: scales relative to the element's own inherited size.
+// Deliberately gated on `lr-text-scaling` ONLY -- the class means "body-sized
+// text that follows the user's scale", and custom bases alone must not touch
+// opted-in third-party content (its `1em` would otherwise be asserted at
+// 100%, overriding any own-size the element carries).
+html.lr-text-scaling {
   .FontSizer-text {
     font-size: calc(1em * var(--lr-text-scale, 1)) !important;
   }

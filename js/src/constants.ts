@@ -12,14 +12,23 @@ export const TEXT_MIN = 100;
 export const TEXT_MAX = 150;
 export const UI_LARGE = 115;
 
-/** Base font sizes (px at 100%) that the scale percentage is applied to. */
-export const TEXT_DEFAULTS = {
-  heroMobile: 16,
-  heroDesktop: 22,
-  body: 14,
-  listMobile: 14,
-  listDesktop: 16,
+/**
+ * Admin-configurable base font sizes (px) that the scale percentage is
+ * applied to. The defaults match the sizes the extension historically
+ * hard-coded, so an untouched install renders identically. `base` covers post
+ * bodies and mobile list titles, `small` covers excerpts, `title` covers hero
+ * and desktop list titles (the desktop hero derives from it at the historical
+ * 16:22 ratio in the stylesheet).
+ */
+export const BASE_DEFAULTS = {
+  base: 14,
+  small: 12,
+  title: 16,
 };
+
+/** Supported range for the admin base-size inputs, in px. */
+export const BASE_MIN = 10;
+export const BASE_MAX = 32;
 
 /**
  * Clamp a percent value to the [TEXT_MIN, TEXT_MAX] range, mapping non-numeric
@@ -31,5 +40,17 @@ export function clampScale(n: number): number {
   if (typeof n !== 'number' || isNaN(n)) return TEXT_MIN;
   if (n < TEXT_MIN) return TEXT_MIN;
   if (n > TEXT_MAX) return TEXT_MAX;
+  return n;
+}
+
+/**
+ * Clamp a base size (px) to the [BASE_MIN, BASE_MAX] range, mapping
+ * non-numeric input to the given default. Same defense-in-depth role as
+ * `clampScale`: the server clamps on serialize, this clamps on read.
+ */
+export function clampBase(n: number, fallback: number): number {
+  if (typeof n !== 'number' || isNaN(n)) return fallback;
+  if (n < BASE_MIN) return BASE_MIN;
+  if (n > BASE_MAX) return BASE_MAX;
   return n;
 }
