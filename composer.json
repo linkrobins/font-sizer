@@ -2,6 +2,8 @@
     "name": "linkrobins/font-sizer",
     "description": "Accessibility-focused font size controls for Flarum 2.0. Users can adjust reading text size and interface size via a header button, with preferences saved in cookies. Admins set sitewide defaults from the extension settings.",
     "type": "flarum-extension",
+    "keywords": ["flarum", "accessibility", "font-size", "readability", "a11y"],
+    "homepage": "https://linkrobins.com/extensions/font-sizer",
     "license": "MIT",
     "authors": [
         {
