@@ -5,11 +5,25 @@
 // restyle the control and modal the normal way.
 
 .FontSizerModal {
-  // Make the reading-size dropdown span the modal width like a normal
-  // Form-group field, instead of the Select's default inline-block width.
-  .FontSizerModal-select {
-    display: block;
-    margin-top: 4px;
+  // The reading-size slider row: the range input takes the width, the live
+  // percentage sits at its right.
+  .FontSizerModal-slider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+
+    input[type='range'] {
+      flex: 1;
+      accent-color: var(--primary-color);
+    }
+  }
+
+  .FontSizerModal-sliderValue {
+    min-width: 3.5em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-color);
   }
 
   // The reset link sits centered just under the primary "Done" button.
@@ -86,7 +100,11 @@ html.lr-text-bases {
   .Post-body blockquote,
   .Post-body td,
   .Post-body th {
-    font-size: calc(var(--lr-text-base, 14px) * var(--lr-text-scale, 1)) !important;
+    // Since 2.0.0-rc.6 core sizes post text with --post-font-size and bumps
+    // it on wide screens (15px at desktop-hd). Falling back through it keeps
+    // that responsive bump when no admin base is set; an admin base still
+    // wins outright, everywhere.
+    font-size: calc(var(--lr-text-base, var(--post-font-size, 14px)) * var(--lr-text-scale, 1)) !important;
   }
 
   .item-excerpt,
@@ -128,12 +146,10 @@ html.lr-text-scaling {
 
 // --- Interface ("Large" mode) ---
 html.lr-ui-scaling {
+  // (.item-nav and .LinksButton were Flarum 1.x selectors that never matched
+  // on 2.0; dropped rather than carried.)
   #header .Button,
-  #header .LinksButton,
-  .DiscussionPage-nav .Button,
-  .item-nav .Button,
-  .item-nav .LinkButton,
-  .item-nav .TagLinkButton {
+  .DiscussionPage-nav .Button {
     font-size: calc(14px * var(--lr-ui-scale, 1)) !important;
   }
 

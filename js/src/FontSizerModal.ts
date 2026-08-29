@@ -6,15 +6,15 @@
  * Esc-to-dismiss and backdrop-click-to-dismiss from the core `Modal`
  * component, so none of that has to be reimplemented by hand.
  *
- * The controls are core Flarum components — a `Select` for the reading-text
- * size and a `Switch` for the larger-interface toggle — wrapped in the usual
+ * The controls: a live slider for the reading-text size (a dropdown between
+ * v1.3 and v1.5; the slider came back by request, d/39187/62) and a core
+ * `Switch` for the larger-interface toggle — wrapped in the usual
  * `Form` / `Form-group` structure, so the dialog looks and behaves like the
  * rest of Flarum. Every change applies live; the primary button just closes.
  */
 import app from 'flarum/forum/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
-import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
@@ -41,12 +41,20 @@ export default class FontSizerModal extends Modal {
         // --- Reading text size --------------------------------------------
         m('div', { className: 'Form-group' }, [
           m('label', app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_heading')),
-          Select.component({
-            options: this.scaleOptions(),
-            value: String(state.textScale),
-            wrapperAttrs: { className: 'FontSizerModal-select' },
-            onchange: (value: string) => setTextScale(parseInt(value, 10)),
-          }),
+          m('div', { className: 'FontSizerModal-slider' }, [
+            m('input', {
+              type: 'range',
+              min: TEXT_MIN,
+              max: TEXT_MAX,
+              step: STEP,
+              value: state.textScale,
+              // oninput, not onchange: the page rescales live under the
+              // drag, which is the entire point of a slider.
+              oninput: (e: InputEvent) => setTextScale(parseInt((e.target as HTMLInputElement).value, 10)),
+              'aria-valuetext': state.textScale + '%',
+            }),
+            m('span', { className: 'FontSizerModal-sliderValue' }, state.textScale + '%'),
+          ]),
           m('p', { className: 'helpText' }, app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_hint')),
         ]),
 
@@ -76,25 +84,5 @@ export default class FontSizerModal extends Modal {
         ),
       ])
     );
-  }
-
-  /**
-   * Build the dropdown's `{ value: label }` map across the supported range.
-   * The current value is always included so an off-grid admin default (e.g.
-   * 113%) stays selectable rather than rendering as a blank option.
-   */
-  private scaleOptions(): Record<string, string> {
-    const values: Record<number, true> = {};
-    for (let v = TEXT_MIN; v <= TEXT_MAX; v += STEP) values[v] = true;
-    values[state.textScale] = true;
-
-    const options: Record<string, string> = {};
-    Object.keys(values)
-      .map(Number)
-      .sort((a, b) => a - b)
-      .forEach((v) => {
-        options[String(v)] = app.translator.trans('linkrobins-font-sizer.forum.modal.reading_text_value', { percent: v }, true);
-      });
-    return options;
   }
 }
