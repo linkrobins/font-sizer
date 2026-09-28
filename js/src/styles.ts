@@ -15,7 +15,7 @@
  * core or in another extension -- that carries the `FontSizer-text` /
  * `FontSizer-ui` class (or references the variables) scales along with it.
  */
-import { TEXT_MIN, UI_LARGE, BASE_DEFAULTS } from './constants';
+import { TEXT_DEFAULT, UI_LARGE, BASE_DEFAULTS } from './constants';
 
 export const TEXT_SCALE_VAR = '--lr-text-scale';
 export const UI_SCALE_VAR = '--lr-ui-scale';
@@ -39,14 +39,17 @@ function root(): HTMLElement | null {
 }
 
 /**
- * Apply (or clear) the reading-text scale. `scale` is a percentage; at the
- * minimum (100) the gate class and variable are removed so the theme renders
- * exactly as it would without the extension.
+ * Apply (or clear) the reading-text scale. `scale` is a percentage; at exactly
+ * TEXT_DEFAULT the gate class and variable are removed so the theme renders
+ * exactly as it would without the extension. The test is equality, not `<=`:
+ * the range now runs below 100, and treating everything under the default as
+ * "nothing to do" would silently disable the whole lower half of the slider.
+ * Callers pass a clamped value (see `clampScale`).
  */
 export function applyTextScale(scale: number): void {
   const el = root();
   if (!el) return;
-  if (scale <= TEXT_MIN) {
+  if (scale === TEXT_DEFAULT) {
     el.classList.remove(TEXT_SCALE_CLASS);
     el.style.removeProperty(TEXT_SCALE_VAR);
     return;

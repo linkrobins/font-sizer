@@ -6,11 +6,11 @@
  * from the forum payload, and (re)applies the generated stylesheets.
  */
 import app from 'flarum/forum/app';
-import { COOKIE_TEXT, COOKIE_UI, TEXT_MIN, BASE_DEFAULTS, clampScale, clampBase } from './constants';
+import { COOKIE_TEXT, COOKIE_UI, TEXT_DEFAULT, BASE_DEFAULTS, clampScale, clampBase } from './constants';
 import { applyTextScale, applyTextBases, applyUiScale, type TextBases } from './styles';
 
 export const state = {
-  textScale: TEXT_MIN,
+  textScale: TEXT_DEFAULT,
   uiLarge: false,
 };
 
@@ -55,7 +55,7 @@ function forumAttribute(name: string): string | undefined {
 
 /** Admin-configured sitewide default scale. */
 export function adminDefaultScale(): number {
-  return clampScale(parseInt(forumAttribute('linkrobinsFontScale') ?? String(TEXT_MIN), 10));
+  return clampScale(parseInt(forumAttribute('linkrobinsFontScale') ?? String(TEXT_DEFAULT), 10));
 }
 
 /** Admin-configured sitewide default interface size. */

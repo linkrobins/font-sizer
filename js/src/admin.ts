@@ -7,7 +7,7 @@ import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
-import { TEXT_MIN, TEXT_MAX, BASE_DEFAULTS, BASE_MIN, BASE_MAX, clampScale, clampBase } from './constants';
+import { TEXT_MIN, TEXT_MAX, TEXT_DEFAULT, BASE_DEFAULTS, BASE_MIN, BASE_MAX, clampScale, clampBase } from './constants';
 import { applyTextScale, applyTextBases, applyUiScale, type TextBases } from './styles';
 
 const EXTENSION_ID = 'linkrobins-font-sizer';
@@ -97,7 +97,7 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
   // `this.setting()` (from AdminPage) returns a memoised Stream bound to the
   // setting, the idiomatic admin accessor — no reaching into the raw
   // `app.data.settings` payload.
-  const scaleStream = this.setting(KEY_SCALE, String(TEXT_MIN));
+  const scaleStream = this.setting(KEY_SCALE, String(TEXT_DEFAULT));
   const uiStream = this.setting(KEY_UI, 'default');
   const baseStreams = {
     base: this.setting(BASE_KEYS.base, String(BASE_DEFAULTS.base)),
@@ -127,9 +127,9 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
   }
 
   function resetScale(): void {
-    scaleStream(String(TEXT_MIN));
-    previewText(TEXT_MIN);
-    persistDebounced(TEXT_MIN, uiStream() === 'large', readBases());
+    scaleStream(String(TEXT_DEFAULT));
+    previewText(TEXT_DEFAULT);
+    persistDebounced(TEXT_DEFAULT, uiStream() === 'large', readBases());
   }
 
   function onBase(key: keyof TextBases, value: string): void {
@@ -186,7 +186,7 @@ override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, orig
           wrapperAttrs: { className: 'FontSizerSettings-select' },
           onchange: onScale,
         }),
-        scale !== TEXT_MIN &&
+        scale !== TEXT_DEFAULT &&
           Button.component(
             {
               className: 'Button Button--text FontSizerSettings-reset',

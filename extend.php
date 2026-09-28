@@ -12,12 +12,19 @@ return [
         ->css(__DIR__ . '/less/admin.less'),
 
     (new Extend\Settings())
-        // Clamp to the supported 100-150% range server-side so the forum
+        // Clamp to the supported 80-150% range server-side so the forum
         // payload can never carry an out-of-range or non-numeric value,
         // whatever ends up in the settings table. Defense in depth: the
         // frontend also clamps on read.
         ->serializeToForum('linkrobinsFontScale', 'linkrobins-font-sizer.scale', function ($value) {
-            return (string) max(100, min(150, (int) $value));
+            // Non-numeric input resolves to the neutral 100%, never to the 80%
+            // floor: a garbled settings row must not shrink the text for every
+            // visitor who has no cookie. Mirrors clampScale() on the frontend.
+            if (!is_numeric($value)) {
+                return '100';
+            }
+
+            return (string) max(80, min(150, (int) $value));
         })
         // Only ever emit one of the two known values.
         ->serializeToForum('linkrobinsFontSizerUi', 'linkrobins-font-sizer.ui', function ($value) {
