@@ -5,7 +5,7 @@ A Flarum 2.0 extension that gives users accessibility-focused font size controls
 ## Features
 
 - **Header button**: a `fa-text-height` icon in the forum header opens a size dialog for all users, including guests
-- **Reading text size**: scales post body text and discussion titles from 100% to 150% in 5% increments
+- **Reading text size**: scales post body text and discussion titles from 80% to 150% in 5% increments
 - **Interface size toggle**: Default or Large (115%) mode for navigation, buttons, and other UI elements
 - **Cookie persistence**: preferences are saved for 1 year so returning visitors keep their settings
 - **Admin defaults**: set a sitewide default for both reading text size and interface size from the extension settings page
@@ -16,7 +16,7 @@ A Flarum 2.0 extension that gives users accessibility-focused font size controls
 
 ## How it works
 
-The reading text size runs from **100%** (Flarum default) to **150%** in 5% increments. The interface size toggle offers **Default** or **Large** (115%). Both values are stored as cookies (`lr_text_scale` and `lr_ui_size`) on the user's browser. If no cookie exists, the user sees whatever the admin has configured as the sitewide default.
+The reading text size runs from **80%** to **150%** in 5% increments, with **100%** being the Flarum default at which the extension asserts nothing. The interface size toggle offers **Default** or **Large** (115%). Both values are stored as cookies (`lr_text_scale` and `lr_ui_size`) on the user's browser. If no cookie exists, the user sees whatever the admin has configured as the sitewide default.
 
 Admin defaults are saved to Flarum's settings table under `linkrobins-font-sizer.scale` and `linkrobins-font-sizer.ui`, and served to the forum frontend in the page payload.
 
