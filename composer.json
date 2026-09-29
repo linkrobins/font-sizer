@@ -27,7 +27,7 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "Link Robins Font Sizer",
+            "title": "LR Font Sizer",
             "icon": {
                 "name": "fas fa-text-height",
                 "backgroundColor": "#1a2535",
