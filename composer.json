@@ -42,5 +42,20 @@
         }
     },
     "minimum-stability": "beta",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "flarum/testing": "^2.0"
+    },
+    "scripts": {
+        "test": [
+            "@test:integration"
+        ],
+        "test:integration": "phpunit -c tests/phpunit.integration.xml",
+        "test:setup": "@php tests/integration/setup.php"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LinkRobins\\FontSizer\\Tests\\": "tests/"
+        }
+    }
 }
