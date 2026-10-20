@@ -89,7 +89,7 @@ function previewUi(uiLarge: boolean): void {
   applyUiScale(uiLarge);
 }
 
-override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, original: () => Mithril.Children) {
+override(ExtensionPage.prototype, 'content', function (this: ExtensionPage, original: (...args: any[]) => Mithril.Children) {
   if (!this.extension || this.extension.id !== EXTENSION_ID) {
     return original();
   }
