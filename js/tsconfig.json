@@ -1,4 +1,12 @@
 {
   "extends": "flarum-tsconfig",
-  "include": ["src/**/*", "forum.ts", "admin.ts"]
+  "include": ["src/**/*", "forum.ts", "admin.ts", "../vendor/*/*/js/dist-typings/@types/**/*"],
+  "compilerOptions": {
+    // TypeScript 7 removed flarum-tsconfig's `moduleResolution: "Node"`.
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "flarum/*": ["../vendor/flarum/core/js/dist-typings/*"]
+    }
+  }
 }
