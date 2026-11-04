@@ -5,13 +5,15 @@ A Flarum 2.0 extension that gives users accessibility-focused font size controls
 ## Features
 
 - **Header button**: a `fa-text-height` icon in the forum header opens a size dialog for all users, including guests
-- **Reading text size**: scales post body text and discussion titles from 80% to 150% in 5% increments
+- **Reading text size**: a slider that scales post body text and discussion titles from 80% to 150% in 5% increments
 - **Interface size toggle**: Default or Large (115%) mode for navigation, buttons, and other UI elements
 - **Cookie persistence**: preferences are saved for 1 year so returning visitors keep their settings
 - **Admin defaults**: set a sitewide default for both reading text size and interface size from the extension settings page
 - **Configurable base sizes**: tell the extension what your theme's post, excerpt, and title sizes are (in px) from the settings page; useful for fonts with a small x-height that need a larger base, no Custom CSS required
 - **Live preview**: the admin settings page previews every control as you change it
+- **Reset to site default**: a button in the dialog clears the visitor's choices and returns them to whatever you set as the default
 - **Debounced save**: admin changes save 300ms after you stop adjusting, so rapid changes coalesce into a single write
+- **No permissions needed**: every visitor can use the button, and nothing about it is stored on your server per user; preferences live in the visitor's own browser
 - **Theme agnostic**: uses Flarum CSS variables throughout; works on all light and dark themes
 
 ## How it works
@@ -65,13 +67,18 @@ Use `--lr-text-scale` for reading content and `--lr-ui-scale` for interface elem
 
 ## Installation
 
-```
+```sh
 composer require linkrobins/font-sizer
 ```
 
+Then switch it on in the admin panel's Extensions page. The defaults are ready to use; adjust them on the extension's settings page if you like.
+
+To update later: `composer update linkrobins/font-sizer`, then `php flarum cache:clear`.
+
 ## Compatibility
 
-- Flarum 2.0 RC1 and later (tested through 2.0.0-rc.5)
+- Flarum 2.0 or later
+- PHP 8.3+
 - No dependencies beyond `flarum/core`
 
 ## License
